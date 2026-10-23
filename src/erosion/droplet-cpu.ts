@@ -69,7 +69,10 @@ export class DropletErosionCPU {
     for (let i = 0; i < count; i++) {
       offsetsX[i] = xList[i];
       offsetsY[i] = yList[i];
-      weights[i] = wList[i];
+      // Normalise so the brush weights sum to 1. Without this the erosion kernel
+      // removes sum(weights) ~ 9x the requested amount per application for
+      // radius 3, which compounds each step until the heightfield diverges.
+      weights[i] = weightSum > 0 ? wList[i] / weightSum : 0;
     }
 
     this.brushCache = { offsetsX, offsetsY, weights };
